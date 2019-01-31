@@ -1,0 +1,81 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Electron Chat</title>
+    <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font: 15px Helvetica, Arial; background: #C0C0C0}
+            form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+            form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+            form button { width: 9%; background: rgb(26, 97, 121); border: none; padding: 10px; }
+            #messages { list-style-type: none; margin: 0; padding-bottom: 25px;margin-bottom: 20px; }
+            #messages li { padding: 5px 10px; }
+            #messages li:nth-child(odd) { background: rgb(219, 215, 215); }
+            button,input {
+              -webkit-app-region: no-drag;
+            }
+            #update{
+              background: #C0C0C0;
+              padding: 10px;
+              
+            }
+            #update input{
+              margin: 8px;
+              padding-top:10px; 
+            }
+          </style>
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+    <script src="src/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+
+    <script>
+   $(function () {
+    let socket = io.connect('http://localhost:3000');
+    $('form').submit(function(e){
+      e.preventDefault(); // prevents page reloading
+      socket.emit('chat message',{'message':$('#m').val()});
+      $('#m').val('');
+      
+      return false;
+      
+    });
+    socket.on('chat message', function(msg){
+      $('#messages').append($('<li>').text(msg.username + " : " + msg.message));
+        
+    });
+
+
+    $('#changeUsername').click(function(){
+        console.log("Change");
+        socket.emit('changeUsername',{"username":$('#username').val()});
+    })
+    $('#roomchange').click(function(){
+        console.log($('#room').val());
+        socket.emit('room',{"roomname":$('#room').val()});
+    })
+        
+    });
+
+    
+
+    </script>
+
+    <script>if (window.module) module = window.module;</script>
+  </head>
+  <body style="-webkit-app-region: drag">
+        <div id="update">
+              <input id="username" autocomplete="off" placeholder="Enter Your Name" value="anonymous"/><button id="changeUsername" >Change Username</button><br />
+        <input id="room" autocomplete="off" placeholder="Enter Room Name" /><button id="roomchange" >Create/Join</button>
+      </div>
+
+        <div class="scroll" id="div1">
+        <ul id="messages"></ul>
+    </div>
+        <form action="">
+          <input id="m" autocomplete="off" /><button>Send</button>
+        </form>
+      </body>
+</html>
